@@ -1,24 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cute cats API</title>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <title>Cat Api App</title>
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+  <script>
+    //ons.disableAutoStyling(); //iOS only!!
+    // or
+    //ons.platform.select('android'); // Android only!! 
+  </script>
+
+  <style>
+
+    #cat-img img{
+      width: 100% !important;
+      cursor: pointer !important;
+    }
+    #cat-img { padding: 15px !important;}
+  </style>
 </head>
-
 <body>
-  <div id="app">
-    <div class="centering">
-      <button v-on:click="getCuteCats">Get your cute cats</button>
-    </div>
-    <div v-for="item in cuteCats" class="adjust">
-      <img :src="item.url" alt="">
-    </div>
-  </div>
-  <script src="apiFunction.js"></script>
-</body>
+  <ons-page>
+    
+    <ons-toolbar>
+      <div class="center">Home</div>
+    </ons-toolbar>
+  
+    <ons-tabbar swipeable position="auto">
+      <ons-tab page="tab1.html" label="Home" icon="md-home" active></ons-tab>
+      <ons-tab page="tab2.html" label="About" icon="fa-address-card" active-icon="fa-user-injured" badge="NEW"></ons-tab>
+      <ons-tab page="tab3.html" label="Contact" icon="md-email" active-icon="md-face"></ons-tab>
 
+    </ons-tabbar>
+  </ons-page>
+  
+  <template id="tab1.html">
+    <ons-page id="Tab1">
+
+      <ons-pull-hook id="pull-hook">
+        Pull to refresh
+      </ons-pull-hook>
+
+      <p style="text-align: center;">
+        
+        <div id="cat-img"></div>
+        <br />
+      
+      </p>
+    </ons-page>
+  </template>
+  
+  <template id="tab2.html">
+    <ons-page id="Tab2">
+      <p style="text-align: center;">
+        This is the 2nd page.
+      </p>
+    </ons-page>
+  </template>
+
+  <template id="tab3.html">
+    <ons-page id="Tab3">
+      <p style="text-align: center;">
+        This is the third page.
+      </p>
+    </ons-page>
+  </template>
+
+  <script>
+    document.addEventListener('prechange', function(event) {
+      document.querySelector('ons-toolbar .center')
+        .innerHTML = event.tabItem.getAttribute('label');
+    });
+
+    function ajax_get(url, callback) {
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+          console.log('responseText:' + xmlhttp.responseText);
+          try {
+            var data = JSON.parse(xmlhttp.responseText);
+          } catch (err) {
+            console.log(err.message + " in " + xmlhttp.responseText);
+            return;
+          }
+          callback(data);
+        }
+      };
+
+      xmlhttp.open("GET", url, true);
+      xmlhttp.send();
+    }
+
+    function callACat() {
+      ajax_get('https://api.thecatapi.com/v1/images/search', function(data) { //?size=full
+        
+        var html = '<img src="' + data[0]["url"] + '" >';
+
+        //html +='<br><p>' + data[0]["id"] + '</p><p>' + data[0]["url"];
+        document.getElementById("cat-img").innerHTML = html;  
+      });
+    }
+    callACat();
+    document.addEventListener('init', function(event) {
+      var catImg = document.getElementById("cat-img");
+      catImg.addEventListener("click", callACat);
+    });
+
+    ons.ready(function() {
+      var pullHook = document.getElementById('pull-hook');
+
+      pullHook.addEventListener('changestate', function(event) {
+        var message = '';
+
+        switch (event.state) {
+          case 'initial':
+            message = 'Pull to refresh';
+            break;
+          case 'preaction':
+            message = 'Release';
+            break;
+          case 'action':
+            message = 'Loading...';
+            break;
+        }
+
+        pullHook.innerHTML = message;
+      });
+
+      pullHook.onAction = function(done) {
+        callACat();
+        setTimeout(done, 1000);
+      };
+    });
+  </script>
+
+</body>
 </html>
