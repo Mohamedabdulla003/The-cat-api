@@ -1,0 +1,50 @@
+*,
+body,
+html {
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  background-image: url('background.jpg');
+  background-size:cover;
+  background-repeat:no-repeat;
+  min-height: 100vh;
+}
+
+button {
+  background-color: #007BFF;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.3s, border-radius 0.6s;
+}
+
+button:hover {
+  filter:brightness(0.7);
+  border-radius:8px;
+}
+
+.centering{
+  display:block;
+}
+
+#app {
+  display:flex-table;
+  align-items:center;
+  justify-content:center;
+  text-align: center;
+  padding: 20px;
+}
+
+.adjust {
+  margin: 10px;
+  display: inline-block;
+}
+
+img {
+  width: 200px;
+  height: 200px;
+  border: 2px solid #007BFF;
+}
